@@ -1,0 +1,23 @@
+diff --git a/modules b/modules
+index f23347b9..e7d85ba8 100644
+--- a/modules
++++ b/modules
+@@ -2,15 +2,15 @@ GLUON_FEEDS='gluon packages routing'
+ 
+ OPENWRT_REPO=https://github.com/openwrt/openwrt.git
+ OPENWRT_BRANCH=master
+-OPENWRT_COMMIT=a47650e4cb947fd494964a1f25726a901d5cb92b
++OPENWRT_COMMIT=73832e1a489b30133113b511fd1643b69d66a18b
+ 
+ PACKAGES_GLUON_REPO=https://github.com/freifunk-gluon/packages.git
+ PACKAGES_GLUON_COMMIT=3d08b0fee8dc5d96d8bcdb985fad1d5564de4022
+ 
+ PACKAGES_PACKAGES_REPO=https://github.com/openwrt/packages.git
+ PACKAGES_PACKAGES_BRANCH=master
+-PACKAGES_PACKAGES_COMMIT=9877676890292628e3819c2a4a718cd99b1e1dc3
++PACKAGES_PACKAGES_COMMIT=924e5ed8db61609e49a7b0b4d939fda246bff1f3
+ 
+ PACKAGES_ROUTING_REPO=https://github.com/openwrt/routing.git
+ PACKAGES_ROUTING_BRANCH=master
+-PACKAGES_ROUTING_COMMIT=8d8cfe8d352ad92002c2faa5dddb044f35e9dab2
++PACKAGES_ROUTING_COMMIT=3b79b64e32c372d2b67afd55d40a45ba23562d4a

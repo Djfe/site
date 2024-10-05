@@ -1,0 +1,51 @@
+diff --git a/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch b/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch
+new file mode 100644
+index 00000000..2b30ca3b
+--- /dev/null
++++ b/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch
+@@ -0,0 +1,45 @@
++From: FFAC <technik@freifunk-aachen.de>
++Date: Sat, 5 Oct 2024 00:10:51 +0000
++Subject: Test disabling second pcie interface for mt7915
++
++might improve stability according to nbd
++
++diff --git a/package/kernel/mt76/Makefile b/package/kernel/mt76/Makefile
++index a07175d4d2af846403f0aa7b748dbe6450449dfd..a57771eb8914b5dd1b9e9c50597e2378b0934200 100644
++--- a/package/kernel/mt76/Makefile
+++++ b/package/kernel/mt76/Makefile
++@@ -1,7 +1,7 @@
++ include $(TOPDIR)/rules.mk
++ 
++ PKG_NAME:=mt76
++-PKG_RELEASE=1
+++PKG_RELEASE=2
++ 
++ PKG_LICENSE:=GPLv2
++ PKG_LICENSE_FILES:=
++diff --git a/package/kernel/mt76/patches/0003-test.patch b/package/kernel/mt76/patches/0003-test.patch
++new file mode 100644
++index 0000000000000000000000000000000000000000..86fe48c0bdb1db0c7b2ef384544e6a77e8b4c789
++--- /dev/null
+++++ b/package/kernel/mt76/patches/0003-test.patch
++@@ -0,0 +1,20 @@
+++diff --git a/mt7915/pci.c b/mt7915/pci.c
+++index 39132894e8ea..ad89fcd9cf69 100644
+++--- a/mt7915/pci.c
++++++ b/mt7915/pci.c
+++@@ -64,6 +64,7 @@ static struct mt7915_hif *mt7915_pci_init_hif2(struct pci_dev *pdev)
+++ {
+++ 	struct pci_dev *tmp_pdev;
+++ 
++++	return NULL;
+++ 	hif_idx++;
+++ 
+++ 	tmp_pdev = pci_get_device(PCI_VENDOR_ID_MEDIATEK, 0x7916, NULL);
+++@@ -84,6 +85,7 @@ static int mt7915_pci_hif2_probe(struct pci_dev *pdev)
+++ {
+++ 	struct mt7915_hif *hif;
+++ 
++++	return -ENODEV;
+++ 	hif = devm_kzalloc(&pdev->dev, sizeof(*hif), GFP_KERNEL);
+++ 	if (!hif)
+++ 		return -ENOMEM;

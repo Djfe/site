@@ -1,0 +1,151 @@
+diff --git a/patches/packages/community/0001-add-ffac-testing.patch b/patches/packages/community/0001-add-ffac-testing.patch
+new file mode 100644
+index 00000000..63873f4c
+--- /dev/null
++++ b/patches/packages/community/0001-add-ffac-testing.patch
+@@ -0,0 +1,145 @@
++From: FFAC <technik@freifunk-aachen.de>
++Date: Sat, 5 Oct 2024 00:32:17 +0000
++Subject: add ffac-testing
++
++diff --git a/ffac-testing/LICENSE b/ffac-testing/LICENSE
++new file mode 100644
++index 0000000000000000000000000000000000000000..fd31e5e136654ee1d777e8db6f8d1434cc4b21b5
++--- /dev/null
+++++ b/ffac-testing/LICENSE
++@@ -0,0 +1,21 @@
+++MIT License
+++
+++Copyright (c) 2024 Felix Baumann
+++
+++Permission is hereby granted, free of charge, to any person obtaining a copy
+++of this software and associated documentation files (the "Software"), to deal
+++in the Software without restriction, including without limitation the rights
+++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+++copies of the Software, and to permit persons to whom the Software is
+++furnished to do so, subject to the following conditions:
+++
+++The above copyright notice and this permission notice shall be included in all
+++copies or substantial portions of the Software.
+++
+++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+++SOFTWARE.
++diff --git a/ffac-testing/Makefile b/ffac-testing/Makefile
++new file mode 100644
++index 0000000000000000000000000000000000000000..6955ddcf9802f2fc4a8c3dbaca81b0c0e796e379
++--- /dev/null
+++++ b/ffac-testing/Makefile
++@@ -0,0 +1,37 @@
+++# SPDX-FileCopyrightText: 2024 Felix Baumann (FFAC)
+++# SPDX-License-Identifier: MIT
+++include $(TOPDIR)/rules.mk
+++
+++PKG_NAME:=ffac-testing
+++PKG_VERSION:=1
+++PKG_RELEASE:=1
+++
+++PKG_LICENSE:=MIT
+++
+++PKG_BUILD_DIR := $(BUILD_DIR)/$(PKG_NAME)
+++
+++include $(TOPDIR)/../package/gluon.mk
+++
+++define Package/$(PKG_NAME)
+++  SECTION:=gluon
+++  CATEGORY:=Gluon
+++  TITLE:=testing
+++  DEPENDS:=@(TARGET_mediatek_filogic||TARGET_ramips_mt7621) kmod-mt7915e +gluon-core +micrond
+++  MAINTAINER:=Freifunk Aachen <kontakt@freifunk-aachen.de>
+++endef
+++
+++define Build/Prepare
+++  mkdir -p $(PKG_BUILD_DIR)
+++endef
+++
+++define Build/Configure
+++endef
+++
+++define Build/Compile
+++endef
+++
+++define Package/$(PKG_NAME)/install
+++  $(CP) ./files/* $(1)/
+++endef
+++
+++$(eval $(call BuildPackage,$(PKG_NAME)))
++diff --git a/ffac-testing/README.md b/ffac-testing/README.md
++new file mode 100644
++index 0000000000000000000000000000000000000000..3ab5872a4360c572cbb8e7d672f4c595b76db4ec
++--- /dev/null
+++++ b/ffac-testing/README.md
++@@ -0,0 +1,46 @@
+++mt7915 hotfix
+++=============
+++
+++This script reloads mt7915-firmware twice a day on targets ramips-mt7621
+++and mediatek-filogic. It's meant as a hotfix for the mcu timeout issue:
+++https://github.com/freifunk-gluon/gluon/issues/3154
+++The issue popped up with Gluon v2023.2, earlier releases are not affected.
+++
+++v1 is currently just a workaround
+++v2 might become an actual hotfix hence the name
+++
+++A first idea for a hotfix was proposed by blocktrron:
+++https://github.com/freifunk-gluon/gluon/pull/3212
+++
+++Create a file `modules` with the following content in your `./gluon/site/`
+++directory and add these lines: 
+++
+++```
+++GLUON_SITE_FEEDS="community"
+++PACKAGES_COMMUNITY_REPO=https://github.com/freifunk-gluon/community-packages.git
+++PACKAGES_COMMUNITY_COMMIT=*/missing/*
+++PACKAGES_COMMUNITY_BRANCH=master
+++```
+++
+++Now you can add the package `ffac-mt7915-hotfix` to your site.mk
+++(`*/missing/*` has to be replaced by the github-commit-ID of the version you
+++want to use, you have to pick it manually.)
+++
+++Further info on the issue this tries to prevent from happening:
+++I've seen the MCU timeout issue happening as early as 16 hours of uptime.
+++MCU timeouts result in WiFi not working. WiFi mesh nodes running into the
+++issue go offline until they are rebooted manually while any wired node is
+++still accessible via ssh.
+++
+++On most devices it will take days or weeks for this issue to manifest,
+++while others are affected daily. This is due to the difference in clients
+++that are connecting to it on a frequent base. The more people frequent
+++the device the more it goes offline.
+++Twice a day might seem exaggerated to some but the it's fast so why not.
+++I want to minimize downtime and therefore reload wifi right before heavy
+++use. Once for sunrise (daytime) and and once before dawn (when bars open).
+++
+++It's not clear whether this fix is required on mediatek-filogic.
+++Freifunk Aachen is only testing it on ramips-mt7621 currently.
+++mediatek-filogic is unstable enough that I suggest rebooting the target
+++3 times a day. See package [ffac-threetime-reboot](https://github.com/freifunk-gluon/community-packages/tree/master/ffac-threetime-reboot)
++diff --git a/ffac-testing/files/lib/gluon/mt7915/hotfix.sh b/ffac-testing/files/lib/gluon/mt7915/hotfix.sh
++new file mode 100755
++index 0000000000000000000000000000000000000000..c552eda4782bb1aa7ae89b4e43a522718f1483a7
++--- /dev/null
+++++ b/ffac-testing/files/lib/gluon/mt7915/hotfix.sh
++@@ -0,0 +1,5 @@
+++#!/bin/sh
+++logger -t "ffac-mt7915-hotfix" -p debug "reloading wifi firmware now"
+++rmmod mt7915e
+++modprobe mt7915e
+++wifi
++diff --git a/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix b/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix
++new file mode 100644
++index 0000000000000000000000000000000000000000..b72d7859fe562744e95ca815138d8d35f019dbcd
++--- /dev/null
+++++ b/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix
++@@ -0,0 +1,2 @@
+++# run every day at 05:45 and 17:45
+++45 5,17 * * * /lib/gluon/mt7915/hotfix.sh

@@ -1,6 +1,6 @@
 diff --git a/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch b/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch
 new file mode 100644
-index 00000000..2b30ca3b
+index 00000000..6d4cff44
 --- /dev/null
 +++ b/patches/openwrt/0006-Test-disabling-second-pcie-interface-for-mt7915.patch
 @@ -0,0 +1,45 @@
@@ -11,7 +11,7 @@ index 00000000..2b30ca3b
 +might improve stability according to nbd
 +
 +diff --git a/package/kernel/mt76/Makefile b/package/kernel/mt76/Makefile
-+index a07175d4d2af846403f0aa7b748dbe6450449dfd..a57771eb8914b5dd1b9e9c50597e2378b0934200 100644
++index 9a7c1f85e26a6c980a05beafc73366160af0cba7..b9ace4dde2bba14c7349419bfbeb1fcbf25dcc9b 100644
 +--- a/package/kernel/mt76/Makefile
 ++++ b/package/kernel/mt76/Makefile
 +@@ -1,7 +1,7 @@

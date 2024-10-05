@@ -21,8 +21,6 @@ packages {
     'ffac-wg-registration',
     'ff-web-ap-timer',
     'respondd-module-airtime',
-    'tecff-general-workaround',
-    'tecff-broken-wlan-workaround',
 }
 
 if not device_class('tiny') and not target('ramips', 'mt7620') then
@@ -202,16 +200,16 @@ if target('bcm27xx') then
     packages(pkgs_hid)
 end
 
-if target('ramips', 'mt7621') then
-    -- reload wifi firmware twice a day
-    packages {
-        'ffac-mt7915-hotfix',
-    }
-end
+--if target('ramips', 'mt7621') then
+--    -- reload wifi firmware twice a day
+--    packages {
+--        'ffac-mt7915-hotfix',
+--    }
+--end
 
-if target('mediatek', 'filogic') then
-    -- reboot target three times a day
-    packages {
-        'ffac-threetime-reboot',
-    }
-end
+--if target('mediatek', 'filogic') then
+--    -- reboot target three times a day
+--    packages {
+--        'ffac-threetime-reboot',
+--    }
+--end

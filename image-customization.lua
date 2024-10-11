@@ -21,6 +21,7 @@ packages {
     'ffac-wg-registration',
     'ff-web-ap-timer',
     'respondd-module-airtime',
+    'ffac-testing',
 --    'tecff-general-workaround',
 --    'tecff-broken-wlan-workaround',
 }

@@ -1,9 +1,9 @@
 diff --git a/patches/packages/community/0001-add-ffac-testing.patch b/patches/packages/community/0001-add-ffac-testing.patch
 new file mode 100644
-index 00000000..63873f4c
+index 00000000..faeb5542
 --- /dev/null
 +++ b/patches/packages/community/0001-add-ffac-testing.patch
-@@ -0,0 +1,145 @@
+@@ -0,0 +1,164 @@
 +From: FFAC <technik@freifunk-aachen.de>
 +Date: Sat, 5 Oct 2024 00:32:17 +0000
 +Subject: add ffac-testing
@@ -37,7 +37,7 @@ index 00000000..63873f4c
 ++SOFTWARE.
 +diff --git a/ffac-testing/Makefile b/ffac-testing/Makefile
 +new file mode 100644
-+index 0000000000000000000000000000000000000000..6955ddcf9802f2fc4a8c3dbaca81b0c0e796e379
++index 0000000000000000000000000000000000000000..6af3654b1cda9ba8ff3c20890f9dd3e43923c9fd
 +--- /dev/null
 ++++ b/ffac-testing/Makefile
 +@@ -0,0 +1,37 @@
@@ -59,7 +59,7 @@ index 00000000..63873f4c
 ++  SECTION:=gluon
 ++  CATEGORY:=Gluon
 ++  TITLE:=testing
-++  DEPENDS:=@(TARGET_mediatek_filogic||TARGET_ramips_mt7621) kmod-mt7915e +gluon-core +micrond
+++  DEPENDS:=+gluon-core
 ++  MAINTAINER:=Freifunk Aachen <kontakt@freifunk-aachen.de>
 ++endef
 ++
@@ -80,7 +80,7 @@ index 00000000..63873f4c
 ++$(eval $(call BuildPackage,$(PKG_NAME)))
 +diff --git a/ffac-testing/README.md b/ffac-testing/README.md
 +new file mode 100644
-+index 0000000000000000000000000000000000000000..3ab5872a4360c572cbb8e7d672f4c595b76db4ec
++index 0000000000000000000000000000000000000000..b47fd52d5300873cbb4878ba0e4d522fb05d3862
 +--- /dev/null
 ++++ b/ffac-testing/README.md
 +@@ -0,0 +1,46 @@
@@ -99,7 +99,7 @@ index 00000000..63873f4c
 ++https://github.com/freifunk-gluon/gluon/pull/3212
 ++
 ++Create a file `modules` with the following content in your `./gluon/site/`
-++directory and add these lines: 
+++directory and add these lines:
 ++
 ++```
 ++GLUON_SITE_FEEDS="community"
@@ -130,22 +130,41 @@ index 00000000..63873f4c
 ++Freifunk Aachen is only testing it on ramips-mt7621 currently.
 ++mediatek-filogic is unstable enough that I suggest rebooting the target
 ++3 times a day. See package [ffac-threetime-reboot](https://github.com/freifunk-gluon/community-packages/tree/master/ffac-threetime-reboot)
-+diff --git a/ffac-testing/files/lib/gluon/mt7915/hotfix.sh b/ffac-testing/files/lib/gluon/mt7915/hotfix.sh
++diff --git a/ffac-testing/files/etc/rc.d/S97fw_debug_wm b/ffac-testing/files/etc/rc.d/S97fw_debug_wm
 +new file mode 100755
-+index 0000000000000000000000000000000000000000..c552eda4782bb1aa7ae89b4e43a522718f1483a7
++index 0000000000000000000000000000000000000000..c4c00453298c3474d79c0e7f9b12234b076325d0
 +--- /dev/null
-++++ b/ffac-testing/files/lib/gluon/mt7915/hotfix.sh
-+@@ -0,0 +1,5 @@
-++#!/bin/sh
-++logger -t "ffac-mt7915-hotfix" -p debug "reloading wifi firmware now"
-++rmmod mt7915e
-++modprobe mt7915e
-++wifi
-+diff --git a/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix b/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix
-+new file mode 100644
-+index 0000000000000000000000000000000000000000..b72d7859fe562744e95ca815138d8d35f019dbcd
+++++ b/ffac-testing/files/etc/rc.d/S97fw_debug_wm
++@@ -0,0 +1,11 @@
+++#!/bin/sh /etc/rc.common
+++
+++START=97
+++
+++start() {
+++	for phy in /sys/kernel/debug/ieee80211/phy*/; do
+++		if [ -d "$phy" ]; then
+++			echo "1" > "$phy"/mt76/fw_debug_wm
+++		fi
+++	done
+++}
++diff --git a/ffac-testing/files/lib/gluon/upgrade/951-testing b/ffac-testing/files/lib/gluon/upgrade/951-testing
++new file mode 100755
++index 0000000000000000000000000000000000000000..18c5c2f2c044eca6197679ea74ed98cd680ec8ec
 +--- /dev/null
-++++ b/ffac-testing/files/usr/lib/micron.d/mt7915-hotfix
-+@@ -0,0 +1,2 @@
-++# run every day at 05:45 and 17:45
-++45 5,17 * * * /lib/gluon/mt7915/hotfix.sh
+++++ b/ffac-testing/files/lib/gluon/upgrade/951-testing
++@@ -0,0 +1,15 @@
+++#!/usr/bin/lua
+++
+++local uci = require('simple-uci').cursor()
+++
+++local system = uci:get_first('system', 'system')
+++
+++uci:set('system', system, 'log_size', 10000)
+++
+++uci:save('system')
+++
+++uci:section('gluon', 'mesh_batman_adv', 'mesh_batman_adv', {
+++	hop_penalty = '25',
+++})
+++
+++uci:save('gluon')

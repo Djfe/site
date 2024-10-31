@@ -1,0 +1,41 @@
+diff --git a/package/gluon-core/luasrc/lib/gluon/upgrade/020-interfaces b/package/gluon-core/luasrc/lib/gluon/upgrade/020-interfaces
+index 5e5243a0..a3653492 100755
+--- a/package/gluon-core/luasrc/lib/gluon/upgrade/020-interfaces
++++ b/package/gluon-core/luasrc/lib/gluon/upgrade/020-interfaces
+@@ -67,6 +67,10 @@ elseif platform.match('ipq40xx', 'generic', {
+ 	'avm,fritzbox-7530',
+ }) then
+ 	lan_ifname, wan_ifname = 'lan2 lan3 lan4', 'lan1'
++elseif platform.match('ipq806x', 'generic', {
++	'ubnt,unifi-ac-hd',
++}) then
++	lan_ifname, wan_ifname = 'eth1', 'eth0'
+ elseif platform.match('ramips', 'mt7621', {
+ 	'netgear,wac104',
+ }) then
+diff --git a/targets/ipq806x-generic b/targets/ipq806x-generic
+index 1b3263fc..eadf507f 100644
+--- a/targets/ipq806x-generic
++++ b/targets/ipq806x-generic
+@@ -26,3 +26,21 @@ device('netgear-nighthawk-x4s-r7800', 'netgear_r7800', {
+ 	factory_ext = '.img',
+ 	packages = QCA9984_PACKAGES,
+ })
++
++device('netgear-nighthawk-xr500', 'netgear_xr500', {
++	factory_ext = '.img',
++	packages = QCA9984_PACKAGES,
++})
++
++
++-- Ubiquiti
++device('ubiquiti-unifi-ac-hd', 'ubnt_unifi-ac-hd', {
++	packages = QCA9984_PACKAGES,
++	factory = false,
++})
++
++
++-- Zyxel
++device('zyxel-nbg6817', 'zyxel_nbg6817', {
++	packages = QCA9984_PACKAGES,
++})
